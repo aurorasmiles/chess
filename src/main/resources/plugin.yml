@@ -1,0 +1,5 @@
+name: Chess
+version: '${project.version}'
+main: at.cutiepie.chess.Chess
+api-version: 1.17
+authors: [ AuroraRainbow, wea_ondara ]
