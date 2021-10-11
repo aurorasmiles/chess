@@ -1,5 +1,8 @@
 package at.cutiepie.chess.model;
 
+import at.cutiepie.chess.util.CoordUtil;
+import org.checkerframework.checker.units.qual.C;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,27 +19,66 @@ public class Figure {
         this.isWhite = isWhite;
     }
 
-    public Set<Coordinate> possibleMovesByType() {
+    public Set<Coordinate> possibleMoves(Board board) {
+        int x = coord.getX();
+        int y = coord.getY();
         Set<Coordinate> coords = new HashSet<>();
         switch (type) {
             case ROOK:
-                for (int i = 1; i <= 8; i++) {
-                    coords.add(new Coordinate(i, coord.getY()));
+                for (int i = x+1; i <= 8; i++) {
+                    Coordinate c = new Coordinate(i, y);
+                    if (board.getFigureAt(c).isEmpty()) {
+                        coords.add(c);
+                    } else if (board.getFigureAt(c).map(color -> isWhite() != color.isWhite()).orElse(true)) {
+                        coords.add(c);
+                        break;
+                    } else {
+                        break;
+                    }
                 }
-                for (int i = 1; i <= 8; i++) {
-                    coords.add(new Coordinate(coord.getX(), i));
+                for (int i = x-1; i >= 1; i--) {
+                    Coordinate c = new Coordinate(i, y);
+                    if (board.getFigureAt(c).isEmpty()) {
+                        coords.add(c);
+                    } else if (board.getFigureAt(c).map(color -> isWhite() != color.isWhite()).orElse(true)) {
+                        coords.add(c);
+                        break;
+                    } else {
+                        break;
+                    }
                 }
-                coords.remove(coord);
+                for (int i = y+1; i <= 8; i++) {
+                    Coordinate c = new Coordinate(x, i);
+                    if (board.getFigureAt(c).isEmpty()) {
+                        coords.add(c);
+                    } else if (board.getFigureAt(c).map(color -> isWhite() != color.isWhite()).orElse(true)) {
+                        coords.add(c);
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                for (int i = y-1; i >= 1; i--) {
+                    Coordinate c = new Coordinate(x, i);
+                    if (board.getFigureAt(c).isEmpty()) {
+                        coords.add(c);
+                    } else if (board.getFigureAt(c).map(color -> isWhite() != color.isWhite()).orElse(true)) {
+                        coords.add(c);
+                        break;
+                    } else {
+                        break;
+                    }
+                }
                 return coords;
             case KNIGHT:
-                addIfPossible(2, 1, coords);
-                addIfPossible(1, 2, coords);
-                addIfPossible(-1, 2, coords);
-                addIfPossible(-2, 1, coords);
-                addIfPossible(-2, -1, coords);
-                addIfPossible(-1, -2, coords);
-                addIfPossible(1, -2, coords);
-                addIfPossible(2, -1, coords);
+                CoordUtil.addIfPossible(2, 1, this, coords, board);
+                CoordUtil.addIfPossible(1, 2, this, coords, board);
+                CoordUtil.addIfPossible(-1, 2, this, coords, board);
+                CoordUtil.addIfPossible(-2, 1, this, coords, board);
+                CoordUtil.addIfPossible(-2, -1, this, coords, board);
+                CoordUtil.addIfPossible(-1, -2, this, coords, board);
+                CoordUtil.addIfPossible(1, -2, this, coords, board);
+                CoordUtil.addIfPossible(2, -1, this, coords, board);
                 return coords;
             case BISHOP:
                 for (int x = coord.getX() + 1, y = coord.getY() + 1; x <= 8 && y <= 8; x++, y++) {
@@ -76,7 +118,7 @@ public class Figure {
             case KING:
                 for (int x = -1; x <= 1; x++) {
                     for (int y = -1; y <= 1; y++) {
-                        addIfPossible(x, y, coords);
+                        CoordUtil.addIfPossible(x, y, this, coords, board);
                     }
                 }
                 coords.remove(coord);
@@ -86,26 +128,30 @@ public class Figure {
                     if (coord.getY() == 2) {
                         coords.add(coord.add(0, 2));
                     }
-                    addIfPossible(-1, 1, coords);
-                    addIfPossible(1, 1, coords);
+                    CoordUtil.addIfPossible(-1, 1, this, coords, board);
+                    CoordUtil.addIfPossible(1, 1, this, coords, board);
                 } else {
                     coords.add(coord.add(0, -1));
                     if (coord.getY() == 7) {
                         coords.add(coord.add(0, -2));
                     }
-                    addIfPossible(-1, -1, coords);
-                    addIfPossible(1, -1, coords);
+                    CoordUtil.addIfPossible(-1, -1, this, coords, board);
+                    CoordUtil.addIfPossible(1, -1, this, coords, board);
                 }
                 return coords;
         }
         return coords;
     }
 
-    private void addIfPossible(int x, int y, Set<Coordinate> coords) {
-        x = coord.getX() + x;
-        y = coord.getY() + y;
-        if (x <= 8 && x >= 1 && y <= 8 && y >= 1) {
-            coords.add(new Coordinate(x, y));
-        }
+    public FigureType getType() {
+        return type;
+    }
+
+    public Coordinate getCoord() {
+        return coord;
+    }
+
+    public boolean isWhite() {
+        return isWhite;
     }
 }

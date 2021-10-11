@@ -1,6 +1,10 @@
 package at.cutiepie.chess.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Board {
     private List<Figure> figures;
@@ -35,9 +39,19 @@ public class Board {
         figures.add(new Figure(FigureType.KING, new Coordinate(5, 8), false));   //black e8
 
         //PAWNS
-        for(int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             figures.add(new Figure(FigureType.PAWN, new Coordinate(i, 2), true));  //white a2 to h2
             figures.add(new Figure(FigureType.PAWN, new Coordinate(i, 7), false)); //black a7 to h7
         }
+    }
+
+    public Set<Coordinate> possibleMoves(Figure f) {
+        Set<Coordinate> possibleMoves = f.possibleMovesByType();
+        possibleMoves = possibleMoves.stream().filter(c -> getFigureAt(c).map(w -> w.isWhite() != f.isWhite()).orElse(true)).collect(Collectors.toSet());
+        return possibleMoves;
+    }
+
+    public Optional<Figure> getFigureAt(Coordinate c) {
+        return figures.stream().filter(f -> f.getCoord().equals(c)).findFirst();
     }
 }
