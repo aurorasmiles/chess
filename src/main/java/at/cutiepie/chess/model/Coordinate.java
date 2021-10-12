@@ -1,13 +1,23 @@
 package at.cutiepie.chess.model;
 
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Coordinate {
+    private static Map<Integer, Coordinate> CACHE = new HashMap<>();
+
+    public static Coordinate of(int x, int y) {
+        int code = (x << 9) | y;
+        synchronized (CACHE) {
+            return CACHE.computeIfAbsent(code, i -> new Coordinate(x, y));
+        }
+    }
+
     private int x;
     private int y;
 
-    public Coordinate(int x, int y) {
-        if (x > 8 || y > 8 || x < 1 || y <1) {
+    private Coordinate(int x, int y) {
+        if (x > 8 || y > 8 || x < 1 || y < 1) {
             throw new IllegalArgumentException("Invalid chess coordinates: " + x + "/" + y);
         }
         this.x = x;
@@ -23,7 +33,7 @@ public class Coordinate {
     }
 
     public Coordinate add(int x, int y) {
-       return new Coordinate(this.x + x, this.y + y);
+        return Coordinate.of(this.x + x, this.y + y);
     }
 
     @Override
@@ -37,5 +47,10 @@ public class Coordinate {
     @Override
     public int hashCode() {
         return (x << 9) | y;
+    }
+
+    @Override
+    public String toString() {
+        return ('A' + x - 1) + "" + y;
     }
 }
