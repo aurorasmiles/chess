@@ -1,6 +1,7 @@
 package at.cutiepie.chess.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +10,20 @@ import java.util.stream.IntStream;
 
 public class Board {
     private final List<Figure> figures = new ArrayList<>(16);
+    private final Input inputWhite;
+    private final Input inputBlack;
+
+    public Board(Input inputWhite, Input inputBlack) {
+        this.inputWhite = inputWhite;
+        this.inputBlack = inputBlack;
+
+        this.inputWhite.setBoard(this);
+        this.inputBlack.setBoard(this);
+    }
+
+    public List<Figure> getFigures() {
+        return Collections.unmodifiableList(figures);
+    }
 
     public void clear() {
         this.figures.clear();
