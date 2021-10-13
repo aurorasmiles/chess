@@ -19,10 +19,20 @@ public class Board {
 
         this.inputWhite.setBoard(this);
         this.inputBlack.setBoard(this);
+
+        this.inputWhite.setTurn(true);
     }
 
     public List<Figure> getFigures() {
         return Collections.unmodifiableList(figures);
+    }
+
+    public Input getInputWhite() {
+        return inputWhite;
+    }
+
+    public Input getInputBlack() {
+        return inputBlack;
     }
 
     public void clear() {
@@ -73,9 +83,18 @@ public class Board {
         return figures.stream().filter(f -> f.getCoord().equals(c)).findFirst();
     }
 
-    public void moveFigure(Figure f, Coordinate to) {
+    protected void moveFigure(Input input, Figure f, Coordinate to) {
+        if (input != inputWhite && input != inputBlack) {
+            throw new IllegalArgumentException("Wrong input");
+        }
+
         if (!figures.contains(f)) {
-            throw new IllegalArgumentException("Figure not on board");
+            throw new IllegalStateException("Figure not on board");
+        }
+
+        //check for proper turn
+        if (!input.isTurn()) {
+            throw new IllegalArgumentException("It is not the input's turn");
         }
 
         //check valid move
